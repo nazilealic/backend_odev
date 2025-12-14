@@ -1,19 +1,32 @@
-var mongoose=require("mongoose");
-var dbURI = process.env.MONGODB_URI;
-//const dbURI = "mongodb://localhost:27017/mekanbul";
-mongoose.connect(dbURI);
-mongoose.connection.on("connected",function(){
-    console.log("Mongoose "+dbURI+" adresindeki veritabanına bağlandı.");
+const mongoose = require("mongoose");
+
+// Vercel'de dotenv gerekmez, ama local için sorun çıkarmaz
+require("dotenv").config();
+
+const dbURI = process.env.MONGODB_URI;
+
+if (!dbURI) {
+  console.error("MONGODB_URI TANIMLI DEGIL!");
+} else {
+  console.log("MongoDB URI alindi");
+}
+
+mongoose.connect(dbURI)
+  .then(() => {
+    console.log("MongoDB baglandi");
+  })
+  .catch(err => {
+    console.error("MongoDB baglanti hatasi:", err.message);
+  });
+
+mongoose.connection.on("disconnected", function () {
+  console.log("MongoDB baglantisi kesildi");
 });
-mongoose.connection.on("error",function(){
-    console.log("Mongoose bağlantı hatası.");
+
+process.on("SIGINT", function () {
+  mongoose.connection.close();
+  console.log("Uygulama kapandi, MongoDB kapandi");
+  process.exit(0);
 });
-mongoose.connection.on("disconnected",function(){
-    console.log("Mongoose bağlantısı kesildi.");
-});
-process.on("SIGINT", function(){
-    mongoose.connection.close();
-    console.log("Mongoose uygulama sonlandırma nedeniyle bağlantıyı kapattı.");
-    process.exit(0);
-});
+
 require("./venue");
