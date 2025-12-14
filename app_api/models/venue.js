@@ -1,6 +1,6 @@
 var mongoose=require("mongoose");
 var hour=new mongoose.Schema({
-    day:{type:String,required:true},
+    days:{type:String,required:true},
     open:{type:String,required:true},
     close:{type:String,required:true},
     isClosed:{type:Boolean,default:false}
